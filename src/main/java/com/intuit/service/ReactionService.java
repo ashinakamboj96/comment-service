@@ -29,7 +29,7 @@ public class ReactionService {
     /**
      * This method will add reactions(likes/dislikes) to post/comment/replies.
      * Note: If the person has already liked and clicks on like again, it will remove the like.
-     * Also, if the person has disliked alread and clicks on like now, it will add the like and remove the dislike for this person
+     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
      *
      * @param entityId        - will be post id for comments and comment id for replies
      * @param reactionRequest request body
