@@ -20,7 +20,7 @@ public class ReactionController {
     private ReactionService reactionService;
 
     /**
-     * This API will add reactions(likes/dislikes) to post/comment/replies
+     * This is a generic API to add reactions(likes/dislikes) to post/comment/replies
      */
     @PatchMapping("/{entityId}")
     public ResponseEntity<Object> updateReaction(@PathVariable final String entityId, @RequestBody final ReactionRequest reactionRequest) {
