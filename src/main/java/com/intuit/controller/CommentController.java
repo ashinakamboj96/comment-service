@@ -21,7 +21,7 @@ public class CommentController {
     private CommentService commentService;
 
     /**
-     * This API will add comments to a post as well as add reply to the comments
+     * This is a generic API for adding comments to a post as well as adding replies to the comments
      */
     @PostMapping
     public ResponseEntity<Object> addComment(@RequestBody final CommentRequest commentRequest) {
@@ -39,9 +39,11 @@ public class CommentController {
     }
 
     /**
+     * This is a generic API for fetching the comments for a post as well the replies for a comment
+     *
      * @param postId   post id
      * @param parentId will be post id in case of comments and comment id in case of replies
-     * @param type     indicates whether the entity to be returned is comment or reply
+     * @param type     indicates whether the entity to be fetched is comments or replies
      * @param page     current page number
      * @param size     page size
      * @return paginated comments for a post or replies for a comment/reply
