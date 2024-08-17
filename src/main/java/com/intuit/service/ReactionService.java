@@ -72,29 +72,24 @@ public class ReactionService {
      * This method will add like to a comment/reply.
      * Note: If the person has already liked and clicks on like again, it will remove the like.
      * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
-     *
      */
     private void updateCommentLikes(String userId, CommentDataModel comment) {
         Reaction likes = comment.getLikes();
         Reaction dislikes = comment.getDislikes();
         // Remove the like if the person has already liked
         if (likes.getUserIds().contains(userId)) {
-            likes.setCount(likes.getCount() - 1);
-            likes.getUserIds().remove(userId);
+            decrementLikes(userId, likes);
             comment.setLikes(likes);
         }
         // Remove the dislike and add like if the person has previously disliked the comment
         else if (dislikes.getUserIds().contains(userId)) {
-            dislikes.setCount(dislikes.getCount() - 1);
-            dislikes.getUserIds().remove(userId);
-            likes.setCount(likes.getCount() + 1);
-            likes.getUserIds().add(userId);
+            decrementDislikes(userId, dislikes);
+            incrementLikes(userId, likes);
             comment.setDislikes(dislikes);
             comment.setLikes(likes);
             // Increase the likes
         } else {
-            likes.setCount(likes.getCount() + 1);
-            likes.getUserIds().add(userId);
+            incrementLikes(userId, likes);
             comment.setLikes(likes);
         }
         commentRepository.save(comment);
@@ -104,29 +99,24 @@ public class ReactionService {
      * This method will add dislike to a comment/reply.
      * Note: If the person has already liked and clicks on like again, it will remove the like.
      * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
-     *
      */
     private void updateCommentDislikes(String userId, CommentDataModel comment) {
         Reaction likes = comment.getLikes();
         Reaction dislikes = comment.getDislikes();
         // Remove the dislike if the person has already disliked the comment
         if (dislikes.getUserIds().contains(userId)) {
-            dislikes.setCount(dislikes.getCount() - 1);
-            dislikes.getUserIds().remove(userId);
+            decrementDislikes(userId, dislikes);
             comment.setDislikes(dislikes);
         }
         // Remove the like and add dislike if the person has previously liked the comment
         else if (likes.getUserIds().contains(userId)) {
-            likes.setCount(likes.getCount() - 1);
-            likes.getUserIds().remove(userId);
-            dislikes.setCount(dislikes.getCount() + 1);
-            dislikes.getUserIds().add(userId);
+            decrementLikes(userId, likes);
+            incrementDislikes(userId, dislikes);
             comment.setLikes(likes);
             comment.setDislikes(dislikes);
             // Increase the dislikes
         } else {
-            dislikes.setCount(dislikes.getCount() + 1);
-            dislikes.getUserIds().add(userId);
+            incrementDislikes(userId, dislikes);
             comment.setDislikes(dislikes);
         }
         commentRepository.save(comment);
@@ -136,29 +126,24 @@ public class ReactionService {
      * This method will add like to a post.
      * Note: If the person has already liked and clicks on like again, it will remove the like.
      * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
-     *
      */
     private void updatePostLikes(String userId, PostDataModel post) {
         Reaction likes = post.getLikes();
         Reaction dislikes = post.getDislikes();
         // Remove the like if the person has already liked the post
         if (likes.getUserIds().contains(userId)) {
-            likes.setCount(likes.getCount() - 1);
-            likes.getUserIds().remove(userId);
+            decrementLikes(userId, likes);
             post.setLikes(likes);
         }
         // Remove the dislike and add like if the person has previously disliked the post
         else if (dislikes.getUserIds().contains(userId)) {
-            dislikes.setCount(dislikes.getCount() - 1);
-            dislikes.getUserIds().remove(userId);
-            likes.setCount(likes.getCount() + 1);
-            likes.getUserIds().add(userId);
+            decrementDislikes(userId, dislikes);
+            incrementLikes(userId, likes);
             post.setDislikes(dislikes);
             post.setLikes(likes);
             // Increase the likes
         } else {
-            likes.setCount(likes.getCount() + 1);
-            likes.getUserIds().add(userId);
+            incrementLikes(userId, likes);
             post.setLikes(likes);
         }
         postRepository.save(post);
@@ -168,31 +153,60 @@ public class ReactionService {
      * This method will add dislike to a post.
      * Note: If the person has already liked and clicks on like again, it will remove the like.
      * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
-     *
      */
     private void updatePostDislikes(String userId, PostDataModel post) {
         Reaction likes = post.getLikes();
         Reaction dislikes = post.getDislikes();
         // Remove the dislike if the person has already disliked the post
         if (dislikes.getUserIds().contains(userId)) {
-            dislikes.setCount(dislikes.getCount() - 1);
-            dislikes.getUserIds().remove(userId);
+            decrementDislikes(userId, dislikes);
             post.setDislikes(dislikes);
         }
         // Remove the like and add dislike if the person has previously liked the post
         else if (likes.getUserIds().contains(userId)) {
-            likes.setCount(likes.getCount() - 1);
-            likes.getUserIds().remove(userId);
-            dislikes.setCount(dislikes.getCount() + 1);
-            dislikes.getUserIds().add(userId);
+            decrementLikes(userId, likes);
+            incrementDislikes(userId, dislikes);
             post.setLikes(likes);
             post.setDislikes(dislikes);
             // Increase the dislikes
         } else {
-            dislikes.setCount(dislikes.getCount() + 1);
-            dislikes.getUserIds().add(userId);
+            incrementDislikes(userId, dislikes);
             post.setDislikes(dislikes);
         }
         postRepository.save(post);
     }
+
+
+    /**
+     * This method will increment the like count by 1 and add the given user to the list of users who have liked the post/comment/reply
+     */
+    private void incrementLikes(String userId, Reaction likes) {
+        likes.setCount(likes.getCount() + 1);
+        likes.getUserIds().add(userId);
+    }
+
+    /**
+     * This method will decrease the dislike count by 1 and remove the given user from the list of users who have disliked the post/comment/reply
+     */
+    private void decrementDislikes(String userId, Reaction dislikes) {
+        dislikes.setCount(dislikes.getCount() - 1);
+        dislikes.getUserIds().remove(userId);
+    }
+
+    /**
+     * This method will decrease the like count by 1 and remove the given user from the list of users who have liked the post/comment/reply
+     */
+    private void decrementLikes(String userId, Reaction likes) {
+        likes.setCount(likes.getCount() - 1);
+        likes.getUserIds().remove(userId);
+    }
+
+    /**
+     * This method will increment the dislike count by 1 and add the given user to the list of users who have disliked the post/comment/reply
+     */
+    private void incrementDislikes(String userId, Reaction dislikes) {
+        dislikes.setCount(dislikes.getCount() + 1);
+        dislikes.getUserIds().add(userId);
+    }
+
 }
