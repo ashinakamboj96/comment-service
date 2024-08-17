@@ -2,5 +2,6 @@ package com.intuit.enums;
 
 public enum EntityType {
     POST,
-    COMMENT
+    COMMENT,
+    REPLY
 }

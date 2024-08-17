@@ -36,7 +36,7 @@ public class ReactionService {
         String entityType = reactionRequest.getEntityType();
         if (EntityType.POST.toString().equalsIgnoreCase(entityType)) {
             updatePostReaction(entityId, reactionRequest);
-        } else if (EntityType.COMMENT.toString().equalsIgnoreCase(entityType)) {
+        } else {
             updateCommentReaction(entityId, reactionRequest);
         }
     }
@@ -60,7 +60,7 @@ public class ReactionService {
      */
     @CacheEvict(value = "CommentCache", key = "#entityId")
     private void updateCommentReaction(String entityId, ReactionRequest reactionRequest) {
-        CommentDataModel comment = commentService.getCommentDataModel(entityId);
+        CommentDataModel comment = commentService.getCommentById(entityId);
         if (ReactionType.LIKE.toString().equalsIgnoreCase(reactionRequest.getReactionType())) {
             updateCommentLikes(reactionRequest.getUserId(), comment);
         } else if (ReactionType.DISLIKE.toString().equalsIgnoreCase(reactionRequest.getReactionType())) {

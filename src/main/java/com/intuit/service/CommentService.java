@@ -1,6 +1,7 @@
 package com.intuit.service;
 
 import com.intuit.enums.CommentType;
+import com.intuit.enums.EntityType;
 import com.intuit.exceptions.CommentsNotFoundException;
 import com.intuit.models.entity.common.Reaction;
 import com.intuit.models.entity.dataModel.CommentDataModel;
@@ -27,11 +28,15 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private PostService postService;
 
     /**
      * This API will add comments to a post as well as add reply to the comments
      */
     public void addComment(CommentRequest commentRequest) {
+        validateIfParentExists(commentRequest.getType(), commentRequest.getParentId());
+
         LocalDateTime now = LocalDateTime.now();
         CommentDataModel comment = CommentDataModel.builder()
                 .id(UUID.randomUUID().toString())
@@ -47,6 +52,20 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+    }
+
+    /**
+     * This method validates whether the parent exists in DB. No content found will be returned if the parent is not found
+     *
+     * @param entityType type of entity: comment or reply
+     * @param parentId post id in case of comment and comment id in case of replies
+     */
+    private void validateIfParentExists(String entityType, String parentId) {
+        if (EntityType.COMMENT.toString().equalsIgnoreCase(entityType)) {
+            postService.getPostById(parentId);
+        } else if (EntityType.REPLY.toString().equalsIgnoreCase(entityType)) {
+            getCommentById(parentId);
+        }
     }
 
     /**
@@ -83,7 +102,7 @@ public class CommentService {
      * @return comment by id
      */
     @Cacheable(value = "CommentCache", key = "#commentId")
-    public CommentDataModel getCommentDataModel(String commentId) {
+    public CommentDataModel getCommentById(String commentId) {
         Optional<CommentDataModel> comment = commentRepository.findById(commentId);
         if (comment.isEmpty()) {
             log.error("Could not find comment with id: {}", commentId);
