@@ -28,8 +28,6 @@ public class ReactionService {
 
     /**
      * This method will add reactions(likes/dislikes) to post/comment/replies.
-     * Note: If the person has already liked and clicks on like again, it will remove the like.
-     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
      *
      * @param entityId        - will be post id for comments and comment id for replies
      * @param reactionRequest request body
@@ -44,7 +42,7 @@ public class ReactionService {
     }
 
     /**
-     * This method will update the like/dislike for a post and update the data in PostCache
+     * This method will update the like/dislike for a post and also update the data in PostCache
      */
     @CacheEvict(value = "PostCache", key = "#entityId")
     private void updatePostReaction(String entityId, ReactionRequest reactionRequest) {
@@ -58,7 +56,7 @@ public class ReactionService {
     }
 
     /**
-     * This method will update the like/dislike for a comment/reply and update the data in PostCache
+     * This method will update the like/dislike for a comment/reply and also update the data in CommentCache
      */
     @CacheEvict(value = "CommentCache", key = "#entityId")
     private void updateCommentReaction(String entityId, ReactionRequest reactionRequest) {
@@ -70,6 +68,12 @@ public class ReactionService {
         }
     }
 
+    /**
+     * This method will add like to a comment/reply.
+     * Note: If the person has already liked and clicks on like again, it will remove the like.
+     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
+     *
+     */
     private void updateCommentLikes(String userId, CommentDataModel comment) {
         Reaction likes = comment.getLikes();
         Reaction dislikes = comment.getDislikes();
@@ -79,7 +83,7 @@ public class ReactionService {
             likes.getUserIds().remove(userId);
             comment.setLikes(likes);
         }
-        // Remove the dislike and add like if the person has previously disliked
+        // Remove the dislike and add like if the person has previously disliked the comment
         else if (dislikes.getUserIds().contains(userId)) {
             dislikes.setCount(dislikes.getCount() - 1);
             dislikes.getUserIds().remove(userId);
@@ -96,6 +100,12 @@ public class ReactionService {
         commentRepository.save(comment);
     }
 
+    /**
+     * This method will add dislike to a comment/reply.
+     * Note: If the person has already liked and clicks on like again, it will remove the like.
+     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
+     *
+     */
     private void updateCommentDislikes(String userId, CommentDataModel comment) {
         Reaction likes = comment.getLikes();
         Reaction dislikes = comment.getDislikes();
@@ -122,6 +132,12 @@ public class ReactionService {
         commentRepository.save(comment);
     }
 
+    /**
+     * This method will add like to a post.
+     * Note: If the person has already liked and clicks on like again, it will remove the like.
+     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
+     *
+     */
     private void updatePostLikes(String userId, PostDataModel post) {
         Reaction likes = post.getLikes();
         Reaction dislikes = post.getDislikes();
@@ -148,6 +164,12 @@ public class ReactionService {
         postRepository.save(post);
     }
 
+    /**
+     * This method will add dislike to a post.
+     * Note: If the person has already liked and clicks on like again, it will remove the like.
+     * Also, if the person has disliked already and clicks on like now, it will add the like and remove the dislike for this person
+     *
+     */
     private void updatePostDislikes(String userId, PostDataModel post) {
         Reaction likes = post.getLikes();
         Reaction dislikes = post.getDislikes();
